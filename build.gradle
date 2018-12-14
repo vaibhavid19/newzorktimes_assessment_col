@@ -25,6 +25,9 @@ repositories {
 
 
 dependencies {
+	compile group: 'com.stripe', name: 'stripe-java', version: '4.4.0'
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testCompile "com.github.tomakehurst:wiremock:2.19.0"
+	testCompile "com.github.tomakehurst:wiremock-standalone:2.19.0"
 }
