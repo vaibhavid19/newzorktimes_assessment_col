@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,73 +40,31 @@ public class PaymentControllerTests {
     }
 
     @Test
+    public void test_create2() throws Exception {
+
+        wireMockRule.givenThat(post(urlPathMatching("/create"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("success")));
+    }
+
+    @Test
     public void test_create1() throws Exception{
-        RestTemplate restTemplate = new RestTemplate();
+
+        ClientHttpRequestFactory requestFactory = new
+                HttpComponentsClientHttpRequestFactory(HttpClients.createDefault());
+
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        //RestTemplate restTemplate = new RestTemplate();
         Charge charge = new Charge(2000L, "sdk", "jsdh", "ksjd");
         String response = restTemplate.postForObject("http://localhost:8080/create", charge, String.class);
         org.junit.Assert.assertEquals("success", response);
         //String responseString = this.convertResponseToString(response.getBody());
 
         verify(postRequestedFor(urlEqualTo("/create")));
-        verify(postRequestedFor(urlMatching("/create"))
-                .withHeader("Content-Type", notMatching("application/json")));
+        verify(postRequestedFor(urlMatching("/create")).withHeader("Content-Type", notMatching("application/json")));
     }
-
-    //@Test
-
-    //public void test_create() throws Exception{
-
-    //
-
-    ////WireMockServer wireMockServer = new WireMockServer();
-
-    ////wireMockServer.start();
-
-    ////configureFor("localhost", 8090);
-
-    ////stubFor(get(urlEqualTo("/create")).willReturn(aResponse().withBody("success")));
-
-    //stubFor(post(urlPathMatching("/create"))
-
-    //.willReturn(aResponse()
-
-    //.withStatus(200)
-
-    //.withHeader("Content-Type", "application/json")
-
-    //.withBody("success")));
-
-    //
-
-    //
-
-    //CloseableHttpClient httpClient = HttpClients.createDefault();
-
-    //HttpGet request = new HttpGet("http://localhost:8080/create");
-
-    //HttpResponse httpResponse = httpClient.execute(request);
-
-    //String responseString = this.convertResponseToString(httpResponse);
-
-    //
-
-    //verify(postRequestedFor(urlEqualTo("/create")));
-
-    //assertEquals("success", responseString);
-
-    //
-
-    //verify(postRequestedFor(urlMatching("/create"))
-
-    //.withRequestBody(matching(".*amount*"))
-
-    //.withHeader("Content-Type", notMatching("application/json")));
-
-    //
-
-    ////wireMockServer.stop();
-
-    //}
 
     private String convertResponseToString(HttpResponse response) throws IOException {
         InputStream responseStream = response.getEntity().getContent();
